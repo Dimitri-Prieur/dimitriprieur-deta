@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
@@ -16,4 +16,4 @@ def hello_world():
     gtag('config', 'UA-251033747-1');
     </script>
     """
-    return prefix_google + "Hello World"
+    return prefix_google + render_template("index.html")
