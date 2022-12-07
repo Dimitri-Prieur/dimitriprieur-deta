@@ -41,6 +41,10 @@ def get_cookies():
 
     return req.cookies.get_dict()
 
+@app.route('/ganalytics', methods = ['GET', 'POST'])
+def get_analytics():       
+    req = requests.get("https://analytics.google.com/analytics/web/#/report-home/a164062586w272485488p243020933")
+    return req.text
 
 if __name__ == "__main__":
     app.run(debug=True)
