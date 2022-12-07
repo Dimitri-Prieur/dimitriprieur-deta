@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import logging 
 import sys
 
@@ -22,10 +22,21 @@ def hello_world():
     """
     return prefix_google + render_template("index.html")
 
-@app.route('/logger', methods=["GET"])
+@app.route('/logger', methods = ['GET', 'POST'])
 def hello_world2():
+    global user_input
     print('This is a back end log!', file=sys.stderr)
     logging.info("Test logging")
-    script = """
-    <script> console.log("This is a front end log!") </script>"""
-    return "This is a test" + render_template("logger.html") + script
+    value = request.form.get("textbox_input")
+
+    
+
+    return render_template("logger.html",text=value) 
+    # global user_input
+    # print('This is a log from python')
+
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
