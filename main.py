@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import logging 
 import sys
+import requests
 
 app = Flask(__name__)
 
@@ -23,19 +24,22 @@ def hello_world():
     return prefix_google + render_template("index.html")
 
 @app.route('/logger', methods = ['GET', 'POST'])
-def hello_world2():
+def logger():
+
     global user_input
+
     print('This is a back end log!', file=sys.stderr)
     logging.info("Test logging")
     value = request.form.get("textbox_input")
 
-    
-
     return render_template("logger.html",text=value) 
-    # global user_input
-    # print('This is a log from python')
 
 
+@app.route('/cookies', methods = ['GET', 'POST'])
+def get_cookies():       
+    req = requests.get("https://www.google.com/")
+
+    return req.cookies.get_dict()
 
 
 if __name__ == "__main__":
