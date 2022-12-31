@@ -2,7 +2,10 @@ from flask import Flask, render_template, request
 import logging 
 import sys
 import requests
+import os
+# from dotenv import load_dotenv
 
+# load_dotenv()
 app = Flask(__name__)
 
 LOGGER = logging.getLogger(__name__)
@@ -42,8 +45,16 @@ def get_cookies():
     return req.cookies.get_dict()
 
 @app.route('/ganalytics', methods = ['GET', 'POST'])
-def get_analytics():       
-    req = requests.get("https://analytics.google.com/analytics/web/#/report-home/a164062586w272485488p243020933")
+def get_analytics():
+
+    mail = os.getenv("Google_mail")
+    password = os.getenv("Google_password")
+
+    payload = {'inUserName': mail, 'inUserPass': password}
+    # url = 'http://www.example.com'
+    other_url = "https://analytics.google.com/analytics/web/#/report-home/a164062586w272485488p243020933"
+    r = requests.post(other_url, data=payload)
+    req = requests.get(other_url, cookies=r.cookies)
     return req.text
 
 if __name__ == "__main__":
