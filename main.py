@@ -11,7 +11,7 @@ load_dotenv()
 
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
 KEY_FILE_LOCATION = 'digitaltracesapi-6e7d1ecf06d4.json'
-VIEW_ID = "281161014"
+VIEW_ID = os.getenv("View_ID")
 
 def initialize_analyticsreporting():
   """Initializes an Analytics Reporting API V4 service object.
@@ -41,8 +41,9 @@ def get_report(analytics):
         'reportRequests': [
         {
           'viewId': VIEW_ID,
-          'dateRanges': [{'startDate': 'today', 'endDate': 'today'}],
-          'metrics': [{'expression': 'ga:users'}],
+          'dateRanges': [{'startDate': '7daysAgo', 'endDate': 'today'}],
+          'metrics': [{'expression': 'ga:pageviews'}],
+          'dimensions': []
           #'dimensions': [{'name': 'ga:country'}]
         }]
       }
@@ -70,7 +71,8 @@ def print_response(response):
       for i, values in enumerate(dateRangeValues):
         print('Date range:', str(i))
         for metricHeader, value in zip(metricHeaders, values.get('values')):
-          print(metricHeader.get('name') + ':', value)
+          visitors = value
+  return str(visitors)
 
 
 app = Flask(__name__)
@@ -91,7 +93,12 @@ def hello_world():
     gtag('config', 'UA-251033747-1');
     </script>
     """
-    return prefix_google + render_template("index.html")
+    analytics = initialize_analyticsreporting()
+    response = get_report(analytics)
+    nb_visitor = print_response(response)
+    logging.info("Test gdx")
+
+    return prefix_google + render_template('index.html', visitors=str(nb_visitor))
 
 @app.route('/logger', methods = ['GET', 'POST'])
 def logger():
@@ -129,9 +136,10 @@ def get_test():
 
     analytics = initialize_analyticsreporting()
     response = get_report(analytics)
-    print(response["reports"])
+    nb_visitor = print_response(response)
+    print("test visitor", nb_visitor)
     logging.info("Test gdx")
-    return "test"
+    return render_template('index.html', visitors=str(nb_visitor))
 
 if __name__ == "__main__":
     app.run(debug=True)
