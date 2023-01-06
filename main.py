@@ -7,6 +7,9 @@ from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from dotenv import load_dotenv
 
+import pandas as pd
+from pytrends.request import TrendReq
+
 load_dotenv()
 
 SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
@@ -131,15 +134,15 @@ def get_analytics():
     req = requests.get(other_url, cookies=r.cookies)
     return req.text
 
-@app.route('/test', methods = ['GET', 'POST'])
-def get_test():
-
-    analytics = initialize_analyticsreporting()
-    response = get_report(analytics)
-    nb_visitor = print_response(response)
-    print("test visitor", nb_visitor)
-    logging.info("Test gdx")
-    return render_template('index.html', visitors=str(nb_visitor))
+@app.route('/pytrends', methods = ['GET', 'POST'])
+def get_pytrends():
+    pytrend = TrendReq(hl='fr', tz=60)
+    kw=['Al-Nassr FC']
+    pytrend.build_payload(kw, cat=0, timeframe='today 3-m', geo='FR', gprop='')
+    df=pytrend.interest_over_time().reset_index()
+    df.set_index("date",inplace=True)
+    
+    return render_template('graph.html', labels=df.index.strftime("%d/%m/%Y").tolist(), values=df["Al-Nassr FC"].tolist())
 
 if __name__ == "__main__":
     app.run(debug=True)
